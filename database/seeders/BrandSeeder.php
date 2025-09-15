@@ -10,7 +10,7 @@ class BrandSeeder extends Seeder
 {
     public function run()
     {
-        Brand::create([
+        Brand::insert([
             ['name' => 'Renault', 'logo' => 'brands/renault.png'],
             ['name' => 'Peugeot', 'logo' => 'brands/peugeot.png'],
             ['name' => 'Tesla', 'logo' => 'brands/tesla.png'],
