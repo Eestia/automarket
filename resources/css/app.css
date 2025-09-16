@@ -1,1 +1,9 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
+/* resources/css/app.css */
+.btn-retour:hover{
+    color: black;
+}
+.btn-retour{
+    text-decoration: none;
+    transition: 0.3s ease;
+}

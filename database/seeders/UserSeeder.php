@@ -21,12 +21,19 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'nom'       => 'Admin',
-            'prenom'    => 'User',
-            'email'     => 'admin@example.com',
-            'tel'       => '0600000001',
-            'password'  => Hash::make('adminpass'),
-            'role_id'   => 3, // admin
+            'nom' => 'Moderateur',
+            'prenom' => 'Mod',
+            'email' => 'modo@example.com',
+            'password' => Hash::make('password'), 
+            'role_id' => 2, 
         ]);
+        User::create([
+            'nom'      => 'Admin',
+            'prenom'   => 'Super',
+            'email'    => 'admin@example.com',
+            'password' => Hash::make('password'),  
+            'role_id'  => 3,                       
+        ]);
+        
     }
 }

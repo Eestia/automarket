@@ -14,11 +14,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-        RoleSeeder::class,
-        UserSeeder::class,
-        BrandSeeder::class,
-        FuelSeeder::class,
-        VehiculeSeeder::class,
-    ]);
+            RoleSeeder::class,
+            UserSeeder::class,
+            BrandSeeder::class,
+            FuelSeeder::class,
+            VehiculeSeeder::class,
+        ]);
+    // 10 utilisateurs normaux
+    User::factory()->count(10)->create();
     }
 }
