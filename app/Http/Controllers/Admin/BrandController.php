@@ -5,56 +5,35 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BrandController extends Controller
 {
-    public function index() {
-        $brands = Brand::all();
-        return inertia('Admin/Brands/Index', compact('brands'));
+    public function index()
+    {
+        return redirect()->route('admin.dashboard');
     }
 
-    public function create() {
-        return inertia('Admin/Brands/Create');
+    public function store(Request $request)
+    {
+        $request->validate(['name' => 'required|string|max:255|unique:brands']);
+        Brand::create(['name' => $request->name]);
+
+        return redirect()->route('admin.dashboard')->with('success', 'Marque ajoutée.');
     }
 
-    public function store(Request $request) {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|max:2048',
-        ]);
+    public function update(Request $request, Brand $brand)
+    {
+        $request->validate(['name' => 'required|string|max:255|unique:brands,name,' . $brand->id]);
+        $brand->update(['name' => $request->name]);
 
-        $path = $request->file('logo') ? $request->file('logo')->store('brands','public') : null;
-
-        Brand::create([
-            'name' => $request->name,
-            'logo' => $path,
-        ]);
-
-        return redirect()->route('brands.index');
+        return redirect()->route('admin.dashboard')->with('success', 'Marque mise à jour.');
     }
 
-    public function edit(Brand $brand) {
-        return inertia('Admin/Brands/Edit', compact('brand'));
-    }
-
-    public function update(Request $request, Brand $brand) {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|max:2048',
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $brand->logo = $request->file('logo')->store('brands','public');
-        }
-
-        $brand->name = $request->name;
-        $brand->save();
-
-        return redirect()->route('brands.index');
-    }
-
-    public function destroy(Brand $brand) {
+    public function destroy(Brand $brand)
+    {
         $brand->delete();
-        return redirect()->route('brands.index');
+
+        return redirect()->route('admin.dashboard')->with('success', 'Marque supprimée.');
     }
 }

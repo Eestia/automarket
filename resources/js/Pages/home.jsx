@@ -17,8 +17,8 @@ export default function Home({ vehicules = [], auth }) {
     <FrontLayout auth={auth}>
       {/* Bannière + recherche */}
       <div className="p-5 text-center bg-primary rounded-3 mb-5">
-        <h1 className="display-4">Bienvenue sur Automarket</h1>
-        <p className="lead">Achetez ou vendez votre véhicule facilement.</p>
+        <h1 className="display-4 text-white">Bienvenue sur Automarket</h1>
+        <p className="lead text-white">Achetez ou vendez votre véhicule facilement.</p>
         <input
           type="text"
           placeholder="Rechercher une voiture..."

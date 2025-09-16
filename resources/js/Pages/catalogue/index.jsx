@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import FrontLayout from '@/Layouts/Front';
+import axios from 'axios';
 import { InertiaLink } from '@inertiajs/inertia-react';
 
 export default function Catalogue({ vehicules, auth }) {
@@ -15,7 +16,7 @@ export default function Catalogue({ vehicules, auth }) {
 
   return (
     <FrontLayout auth={auth}>
-      <div className="container py-5">
+      <div className="container py-5 rounded" style={{ backgroundColor: '#e0f0ff' }}>
         <h1 className="mb-4">Catalogue complet des voitures</h1>
 
         <input
@@ -45,12 +46,33 @@ export default function Catalogue({ vehicules, auth }) {
                       {car.type} - {car.annee} - {car.kilometrage.toLocaleString()} km
                     </p>
                     <p className="card-text fw-bold mb-3">{car.prix.toLocaleString()} €</p>
+
                     <InertiaLink
                       href={`/cars/${car.id}`}
-                      className="btn btn-primary mt-auto"
+                      className="btn btn-primary mt-auto mb-2"
                     >
                       Voir détails
                     </InertiaLink>
+
+                    {/* ✅ Bouton visible uniquement si l'utilisateur est connecté */}
+                    {auth.user && (
+                        <button
+                            className="btn btn-outline-success"
+                            onClick={async () => {
+                            if (confirm(`Contacter le vendeur pour ${car.model} ?`)) {
+                                try {
+                                await axios.post(`/vehicules/${car.id}/contact`);
+                                alert('Email envoyé !');
+                                } catch (err) {
+                                console.error(err);
+                                alert('Erreur lors de l’envoi du mail.');
+                                }
+                            }
+                            }}
+                        >
+                        Contacter le vendeur
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

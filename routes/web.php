@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\VehiculeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
@@ -9,17 +10,8 @@ use App\Models\Vehicule;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\DemoMail;
 use Inertia\Inertia;
-
-// Welcome
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -39,7 +31,7 @@ Route::get('/catalogue', function () {
             ] : null
         ],
     ]);
-})->name('catalogue.index'); 
+})->name('catalogue.index');
 
 // Véhicules (auth)
 Route::middleware('auth')->group(function () {
@@ -66,20 +58,21 @@ Route::middleware('auth')->group(function () {
 });
 
 // Show vehicule
-Route::get('/cars/{vehicule}', function (App\Models\Vehicule $vehicule) {
+Route::get('/cars/{vehicule}', function (Vehicule $vehicule) {
     return Inertia::render('vehicules/show', [
         'vehicule' => $vehicule,
         'auth' => [
-        'user'     => Auth::user() ? [
-        'id'       => Auth::user()->id,
-        'nom'      => Auth::user()->nom,
-        'prenom'   => Auth::user()->prenom,
-        'role'     => Auth::user()->role->name ?? null,
-        'role_id'  => Auth::user()->role_id,   // ← important
-    ] : null,
+            'user' => Auth::user() ? [
+                'id' => Auth::user()->id,
+                'nom' => Auth::user()->nom,
+                'prenom' => Auth::user()->prenom,
+                'role' => Auth::user()->role->name ?? null,
+                'role_id' => Auth::user()->role_id,
+            ] : null,
         ],
     ]);
 })->name('vehicules.show');
+
 // Profile routes
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -88,12 +81,34 @@ Route::middleware('auth')->group(function () {
 });
 
 // Admin routes (auth + permission)
-Route::middleware(['auth', 'can:manage-users'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
-    Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-});
-Route::put('/admin/users/{user}/role',
-    [UserController::class, 'updateRole'])->name('admin.users.updateRole');
+Route::middleware(['auth', 'can:manage-users'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        // Dashboard / Users
+        Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
+        Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        // Brands CRUD
+        Route::get('/brands', [BrandController::class, 'index'])->name('brands.index');
+        Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
+        Route::put('/brands/{brand}', [BrandController::class, 'update'])->name('brands.update');
+        Route::delete('/brands/{brand}', [BrandController::class, 'destroy'])->name('brands.destroy');
+    });
+    
+        Route::post('/vehicules/{vehicule}/contact', function (Request $request, Vehicule $vehicule) {
+            $user = auth()->user();
+            if (!$user) {
+                abort(403);
+            }
+
+            // Envoie le mail à toi-même
+            Mail::to('dilaraozturk028@gmail.com')->send(new DemoMail($vehicule, $user));
+
+            return response()->json(['message' => 'Email envoyé !']);
+        })->middleware('auth')->name('vehicules.contact');
 
 require __DIR__.'/auth.php';
+

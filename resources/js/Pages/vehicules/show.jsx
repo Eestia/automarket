@@ -53,7 +53,7 @@ export default function ShowVehicule({ vehicule, auth }) {
                         </ul>
 
                         <h3 className="fw-bold">{vehicule.prix.toLocaleString()} €</h3>
-                        {auth.user && [2,3].includes(auth.user.role_id) && (
+                        {auth.user && (auth.user.role_id >= 2 || auth.user.id === vehicule.user_id) && (
                             <button
                                 onClick={() => {
                                     if (confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')) {
